@@ -31,6 +31,6 @@ jobs:
         with:
           source-directory: 'build'
           destination-github-username: 'matdoidge'
-          destination-repository-name: 'Alakazam-Dashboard'
+          destination-repository-name: 'alakazam-dashboard'
           user-email: 'mat@gittings.studio'
           target-branch: 'main'
