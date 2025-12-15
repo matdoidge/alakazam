@@ -1,0 +1,36 @@
+name: Deploy to HACS Dist
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Dist Repo
+        uses: cpina/github-action-push-to-another-repository@v1.5.1
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.DIST_REPO_TOKEN }}
+        with:
+          source-directory: 'build'
+          destination-github-username: 'YOUR_GITHUB_USERNAME'
+          destination-repository-name: 'YOUR_DIST_REPO_NAME'
+          user-email: 'your-email@example.com'
+          target-branch: 'main'
