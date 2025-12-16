@@ -6,7 +6,6 @@ export default defineConfig({
 	server: {
 		host: true
 	},
-	base: './', // Use relative base path for subdirectory deployment
 	build: {
 		// Ensure assets are built with correct paths for HACS
 		assetsInlineLimit: 0, // Don't inline small assets
