@@ -13,7 +13,11 @@ const config = {
 		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 		adapter: adapter({
 			fallback: 'index.html' // Enable SPA mode
-		})
+		}),
+		// Use relative paths so the app works when served from a subdirectory (like /hacsfiles/alakazam-dashboard/)
+		paths: {
+			relative: true
+		}
 	}
 };
 
