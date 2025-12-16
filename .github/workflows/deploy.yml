@@ -24,6 +24,30 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Fix paths in build output for subdirectory deployment
+        run: |
+          # Fix absolute paths to relative paths in index.html and JS files
+          if [ -f "build/index.html" ]; then
+            # Replace /_app/ with ./_app/ for relative paths (handle both quoted and unquoted)
+            sed -i.bak 's|"/_app/|"./_app/|g' build/index.html
+            sed -i.bak "s|'/_app/|'./_app/|g" build/index.html
+            sed -i.bak 's|/_app/|./_app/|g' build/index.html
+            # Fix other absolute paths
+            sed -i.bak 's|href="/|href="./|g' build/index.html
+            sed -i.bak 's|src="/|src="./|g' build/index.html
+            # Remove backup file
+            rm -f build/index.html.bak
+            echo "✓ Fixed paths in index.html"
+          fi
+          # Also fix paths in JavaScript files if they exist
+          find build/_app -name "*.js" -type f 2>/dev/null | while read file; do
+            sed -i.bak 's|"/_app/|"./_app/|g' "$file" 2>/dev/null || true
+            sed -i.bak "s|'/_app/|'./_app/|g" "$file" 2>/dev/null || true
+            sed -i.bak 's|/_app/|./_app/|g' "$file" 2>/dev/null || true
+            rm -f "${file}.bak" 2>/dev/null || true
+          done
+          echo "✓ Fixed paths in JavaScript files"
+
       - name: Copy README to build and verify hacs.json
         run: |
           cp README.md build/ || echo "README.md not found, skipping"
