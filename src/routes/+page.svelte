@@ -41,7 +41,15 @@
 	}
 
 	onMount(() => {
-		connectToHA();
+		console.log("Alakazam Dashboard: Initializing...");
+		console.log("Current URL:", typeof window !== "undefined" ? window.location.href : "N/A");
+
+		try {
+			connectToHA();
+		} catch (error) {
+			console.error("Error connecting to HA:", error);
+		}
+
 		const interval = setInterval(() => {
 			now = new Date();
 		}, 1000);

@@ -46,24 +46,41 @@ function getHassUrl(): string {
   // If running in HA, try to get URL from window location or parent
   if (typeof window !== 'undefined') {
     try {
+      const currentOrigin = window.location.origin;
+      
       // If in iframe, parent might be HA
       if (window.parent !== window) {
         try {
           const parentUrl = window.parent.location.origin;
-          // Common HA ports
-          if (parentUrl.includes(':8123') || parentUrl.includes('home-assistant')) {
+          // Common HA ports or home-assistant domain
+          if (parentUrl.includes(':8123') || parentUrl.includes('home-assistant') || parentUrl.includes('homeassistant')) {
             return parentUrl;
           }
         } catch (e) {
-          // Cross-origin, can't access parent
+          // Cross-origin, can't access parent - use current origin
+          if (currentOrigin.includes(':8123') || currentOrigin.includes('home-assistant') || currentOrigin.includes('homeassistant')) {
+            return currentOrigin;
+          }
         }
       }
-      // Check current window
-      if (window.location.origin.includes(':8123') || window.location.origin.includes('home-assistant')) {
-        return window.location.origin;
+      
+      // Check current window - if we're on a HA URL, use it
+      if (currentOrigin.includes(':8123') || 
+          currentOrigin.includes('home-assistant') || 
+          currentOrigin.includes('homeassistant') ||
+          window.location.hostname.includes('homeassistant') ||
+          window.location.hostname.includes('home-assistant')) {
+        return currentOrigin;
+      }
+      
+      // If we're on a path like /hacsfiles/, extract the base URL
+      if (window.location.pathname.includes('/hacsfiles/') || 
+          window.location.pathname.includes('/local/')) {
+        // We're being served from HA, so the origin is the HA URL
+        return currentOrigin;
       }
     } catch (e) {
-      // Ignore
+      console.error('Error detecting HA URL:', e);
     }
   }
   
@@ -120,6 +137,7 @@ async function saveTokens(tokens: any) {
 export async function connectToHA() {
   try {
     const hassUrl = getHassUrl();
+    console.log('Connecting to Home Assistant at:', hassUrl);
     
     const auth = await getAuth({
       hassUrl,
@@ -127,6 +145,7 @@ export async function connectToHA() {
       saveTokens
     });
 
+    console.log('Authentication successful, creating connection...');
     conn = await createConnection({ auth });
     
     // Set connected immediately as createConnection resolves when connected

@@ -45,6 +45,41 @@ A beautiful, modern dashboard for Home Assistant built with SvelteKit.
 
 The dashboard will automatically connect to your Home Assistant instance. On first use, you'll be prompted to authenticate.
 
+## Troubleshooting
+
+### Blank Page / MIME Type Errors
+
+If you see a blank page or errors about "disallowed MIME type" in the browser console, Home Assistant's web server may not be serving JavaScript files with the correct MIME type.
+
+**Solution 1: Configure Home Assistant (Recommended)**
+
+Add this to your `configuration.yaml`:
+
+```yaml
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - ::1
+```
+
+Then restart Home Assistant.
+
+**Solution 2: Use a Reverse Proxy**
+
+If you're using Nginx or another reverse proxy, ensure it's configured to serve `.js` files with the correct MIME type:
+
+```nginx
+types {
+    application/javascript js mjs;
+    text/css css;
+}
+```
+
+**Solution 3: Clear Browser Cache**
+
+Sometimes clearing your browser cache (Ctrl+F5 or Cmd+Shift+R) resolves cached MIME type issues.
+
 ## Development
 
 This dashboard is built with:
