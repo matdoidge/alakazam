@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { entities, HASS_URL } from "$lib/services/ha";
+	import { entities, getEntityPictureUrl } from "$lib/services/ha";
 	import { House, Tent, User, Battery } from "lucide-svelte";
 
 	export let entityId: string;
@@ -10,7 +10,7 @@
 	$: state = entity?.state;
 	$: isHome = state === "home";
 	$: picturePath = entity?.attributes.entity_picture;
-	$: picture = picturePath ? new URL(picturePath, HASS_URL).href : null;
+	$: picture = getEntityPictureUrl(picturePath);
 
 	$: batteryEntity = batteryEntityId ? $entities[batteryEntityId] : null;
 	$: batteryLevel = (() => {

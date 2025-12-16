@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { entities, connection, HASS_URL } from "$lib/services/ha";
+	import { entities, connection, getEntityPictureUrl } from "$lib/services/ha";
 	import { callService } from "home-assistant-js-websocket";
 	import { Play, Pause, SkipBack, SkipForward, Power, Tv, Thermometer } from "lucide-svelte";
 
@@ -16,7 +16,7 @@
 	$: artist = attributes.media_artist || attributes.media_series_title || "";
 
 	$: picturePath = attributes.entity_picture;
-	$: artwork = picturePath ? new URL(picturePath, HASS_URL).href : null;
+	$: artwork = getEntityPictureUrl(picturePath);
 
 	$: temperatureEntity = temperatureEntityId ? $entities[temperatureEntityId] : null;
 	$: temperature = temperatureEntity

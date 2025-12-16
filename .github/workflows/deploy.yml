@@ -24,6 +24,17 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Copy README to build and verify hacs.json
+        run: |
+          cp README.md build/ || echo "README.md not found, skipping"
+          if [ -f "build/hacs.json" ]; then
+            echo "✓ hacs.json found in build output"
+          elif [ -f "static/hacs.json" ]; then
+            cp static/hacs.json build/ && echo "✓ Copied hacs.json from static/"
+          else
+            echo "⚠ Warning: hacs.json not found"
+          fi
+
       - name: Deploy to Dist Repo
         uses: cpina/github-action-push-to-another-repository@v1.5.1
         env:

@@ -9,12 +9,6 @@ import {
 } from 'home-assistant-js-websocket';
 import { writable, type Writable } from 'svelte/store';
 
-// Configuration - Replace these with your actual details or use environment variables
-export const HASS_URL = 'http://192.168.4.198:8123'; 
-// In a real app, use an auth flow or a long-lived token carefully.
-// For a personal dashboard, a token is often hardcoded or loaded from env.
-const HASS_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI5MGUyMmI1ZjM5MzE0YjAwYjExMmIwYjIyOWQzMGU2ZSIsImlhdCI6MTc2NTM3NzAxMSwiZXhwIjoyMDgwNzM3MDExfQ.IYC-J2dChOGDq18zbtuj-q7ljJwfyQ12SDKFZUobn2k'; 
-
 export const entities: Writable<HassEntities> = writable({});
 export const connection: Writable<Connection | null> = writable(null);
 export const connected: Writable<boolean> = writable(false);
@@ -22,26 +16,113 @@ export const connectionError: Writable<string | null> = writable(null);
 
 let conn: Connection;
 
+// Detect if running in Home Assistant context
+function isRunningInHA(): boolean {
+  // Check if we're in an iframe with HA context
+  if (typeof window !== 'undefined') {
+    try {
+      // Check for HA's window object
+      if ((window as any).hassConnection) {
+        return true;
+      }
+      // Check if we're in an iframe and parent might be HA
+      if (window.parent !== window) {
+        try {
+          const parentHass = (window.parent as any).hassConnection;
+          if (parentHass) return true;
+        } catch (e) {
+          // Cross-origin, can't access
+        }
+      }
+    } catch (e) {
+      // Ignore errors
+    }
+  }
+  return false;
+}
+
+// Get Home Assistant URL - try to detect from context
+function getHassUrl(): string {
+  // If running in HA, try to get URL from window location or parent
+  if (typeof window !== 'undefined') {
+    try {
+      // If in iframe, parent might be HA
+      if (window.parent !== window) {
+        try {
+          const parentUrl = window.parent.location.origin;
+          // Common HA ports
+          if (parentUrl.includes(':8123') || parentUrl.includes('home-assistant')) {
+            return parentUrl;
+          }
+        } catch (e) {
+          // Cross-origin, can't access parent
+        }
+      }
+      // Check current window
+      if (window.location.origin.includes(':8123') || window.location.origin.includes('home-assistant')) {
+        return window.location.origin;
+      }
+    } catch (e) {
+      // Ignore
+    }
+  }
+  
+  // Fallback: try to get from localStorage or use default
+  if (typeof window !== 'undefined') {
+    const savedUrl = localStorage.getItem('hassUrl');
+    if (savedUrl) return savedUrl;
+  }
+  
+  // Default fallback (for development)
+  return 'http://homeassistant.local:8123';
+}
+
+// Export helper function to build full URLs for entity pictures
+export function getEntityPictureUrl(relativePath: string | undefined | null): string | null {
+  if (!relativePath) return null;
+  try {
+    const hassUrl = getHassUrl();
+    return new URL(relativePath, hassUrl).href;
+  } catch (e) {
+    console.error('Error building entity picture URL:', e);
+    return null;
+  }
+}
+
 async function loadTokens() {
-    // Simple mock for token storage. In production, use localStorage or similar.
-    return {
-        access_token: HASS_TOKEN,
-        expires: Date.now() + 1e11, // Far future
-        hassUrl: HASS_URL,
-        clientId: null,
-        expires_in: 1e11,
-        refresh_token: ''
-    };
+  // Try to load from localStorage
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('hassTokens');
+    if (saved) {
+      try {
+        const tokens = JSON.parse(saved);
+        // Check if tokens are still valid (not expired)
+        if (tokens.expires && tokens.expires > Date.now()) {
+          return tokens;
+        }
+      } catch (e) {
+        // Invalid tokens, continue to auth flow
+      }
+    }
+  }
+  
+  // No saved tokens, will trigger auth flow
+  return null;
 }
 
 async function saveTokens(tokens: any) {
-    // Save tokens if needed
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('hassTokens', JSON.stringify(tokens));
+    localStorage.setItem('hassUrl', tokens.hassUrl);
+  }
 }
 
 export async function connectToHA() {
   try {
+    const hassUrl = getHassUrl();
+    
     const auth = await getAuth({
-      hassUrl: HASS_URL,
+      hassUrl,
       loadTokens,
       saveTokens
     });

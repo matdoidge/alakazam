@@ -1,38 +1,58 @@
-# sv
+# Alakazam Dashboard
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A beautiful, modern dashboard for Home Assistant built with SvelteKit.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- 🎨 Modern, responsive UI with dark mode support
+- 💡 Light controls with brightness adjustment
+- 🔌 Switch and automation controls
+- 👤 Person presence tracking
+- 📊 Sensor monitoring
+- 📅 Calendar integration
+- 🎵 Media player controls
+- 🔒 Security system (alarm) controls
+- 📱 Mobile-friendly design
 
-```sh
-# create a new project in the current directory
-npx sv create
+## Installation
 
-# create a new project in my-app
-npx sv create my-app
-```
+### Via HACS (Recommended)
 
-## Developing
+1. Open HACS in Home Assistant
+2. Go to **Frontend** → **Explore & Download Repositories**
+3. Search for **Alakazam Dashboard**
+4. Click **Download**
+5. Restart Home Assistant
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Manual Installation
 
-```sh
-npm run dev
+1. Download the latest release from the [releases page](https://github.com/matdoidge/alakazam-dashboard/releases)
+2. Extract the files to your Home Assistant `www` directory: `/config/www/alakazam-dashboard/`
+3. Add the resource in Home Assistant:
+   - Go to **Settings** → **Dashboards** → **Resources**
+   - Click **Add Resource**
+   - URL: `/local/alakazam-dashboard/index.html`
+   - Type: **JavaScript Module**
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+## Usage
 
-## Building
+1. After installation, go to **Settings** → **Dashboards**
+2. Create a new dashboard or edit an existing one
+3. Add a card with type: **Manual** or use the **Panel** view
+4. Set the URL to: `/hacsfiles/alakazam-dashboard/index.html` (if installed via HACS) or `/local/alakazam-dashboard/index.html` (if manual)
 
-To create a production version of your app:
+## Configuration
 
-```sh
-npm run build
-```
+The dashboard will automatically connect to your Home Assistant instance. On first use, you'll be prompted to authenticate.
 
-You can preview the production build with `npm run preview`.
+## Development
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+This dashboard is built with:
+- [SvelteKit](https://kit.svelte.dev/)
+- [Home Assistant JS WebSocket](https://github.com/home-assistant/home-assistant-js-websocket)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Lucide Icons](https://lucide.dev/)
+
+## License
+
+This project is licensed under the MIT License.
