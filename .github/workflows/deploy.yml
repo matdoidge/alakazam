@@ -26,18 +26,24 @@ jobs:
 
       - name: Fix paths in build output for subdirectory deployment
         run: |
-          # Fix absolute paths to relative paths in index.html and JS files
+          # Fix absolute paths to relative paths in index.html
           if [ -f "build/index.html" ]; then
-            # Replace /_app/ with ./_app/ for relative paths (handle both quoted and unquoted)
+            # Replace absolute paths with relative paths
+            # Handle script and link tags with /_app/ paths
+            sed -i.bak 's|src="/_app/|src="./_app/|g' build/index.html
+            sed -i.bak 's|href="/_app/|href="./_app/|g' build/index.html
             sed -i.bak 's|"/_app/|"./_app/|g' build/index.html
             sed -i.bak "s|'/_app/|'./_app/|g" build/index.html
-            sed -i.bak 's|/_app/|./_app/|g' build/index.html
-            # Fix other absolute paths
+            # Also handle any other absolute paths that might exist
             sed -i.bak 's|href="/|href="./|g' build/index.html
             sed -i.bak 's|src="/|src="./|g' build/index.html
+            # Remove any base tag that might interfere
+            sed -i.bak '/<base/d' build/index.html
             # Remove backup file
             rm -f build/index.html.bak
             echo "✓ Fixed paths in index.html"
+            # Show a sample of the fixed file for debugging
+            grep -o 'src="[^"]*"' build/index.html | head -3 || true
           fi
           # Also fix paths in JavaScript files if they exist
           find build/_app -name "*.js" -type f 2>/dev/null | while read file; do

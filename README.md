@@ -49,36 +49,40 @@ The dashboard will automatically connect to your Home Assistant instance. On fir
 
 ### Blank Page / MIME Type Errors
 
-If you see a blank page or errors about "disallowed MIME type" in the browser console, Home Assistant's web server may not be serving JavaScript files with the correct MIME type.
+If you see a blank page or errors about "disallowed MIME type" in the browser console, Home Assistant's web server is serving JavaScript files with the wrong MIME type (`text/plain` instead of `application/javascript`). This is a known limitation of Home Assistant's built-in web server.
 
-**Solution 1: Configure Home Assistant (Recommended)**
+**Solution 1: Use a Reverse Proxy (Recommended)**
 
-Add this to your `configuration.yaml`:
+If you're using Nginx, Traefik, or another reverse proxy, configure it to serve files from `/hacsfiles/` with correct MIME types:
 
-```yaml
-http:
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - 127.0.0.1
-    - ::1
-```
-
-Then restart Home Assistant.
-
-**Solution 2: Use a Reverse Proxy**
-
-If you're using Nginx or another reverse proxy, ensure it's configured to serve `.js` files with the correct MIME type:
-
+**Nginx example:**
 ```nginx
-types {
-    application/javascript js mjs;
-    text/css css;
+location /hacsfiles/ {
+    types {
+        application/javascript js mjs;
+        text/css css;
+    }
 }
 ```
 
-**Solution 3: Clear Browser Cache**
+**Traefik example:**
+Add MIME type configuration in your Traefik config.
 
-Sometimes clearing your browser cache (Ctrl+F5 or Cmd+Shift+R) resolves cached MIME type issues.
+**Solution 2: Manual Installation (Workaround)**
+
+Instead of using HACS, manually install to `/config/www/`:
+
+1. Download the latest release
+2. Extract to `/config/www/alakazam-dashboard/`
+3. Access at `/local/alakazam-dashboard/index.html`
+
+This sometimes works better than HACS for MIME type issues.
+
+**Solution 3: Report to HACS**
+
+This is a known issue with HACS frontend integrations. Consider reporting it to the [HACS repository](https://github.com/hacs/integration/issues) so they can fix the MIME type handling.
+
+**Note:** The HTTP configuration in `configuration.yaml` does not fix this issue, as Home Assistant's Python web server doesn't respect those settings for `/hacsfiles/` paths.
 
 ## Development
 
