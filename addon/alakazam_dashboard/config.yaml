@@ -18,9 +18,11 @@ ports:
   "8080/tcp": null
 options:
   update_interval: 3600
-  github_repo: "matdoidge/alakazam-dashboard"
+  github_repo: "matdoidge/alakazam"
   github_branch: "main"
+  build_path: "dist"
 schema:
   update_interval: int?
   github_repo: str?
   github_branch: str?
+  build_path: str?

@@ -4,16 +4,19 @@ set -e
 # Load options
 if [ -f /data/options.json ]; then
     UPDATE_INTERVAL=$(jq -r '.update_interval // 3600' /data/options.json)
-    GITHUB_REPO=$(jq -r '.github_repo // "matdoidge/alakazam-dashboard"' /data/options.json)
+    GITHUB_REPO=$(jq -r '.github_repo // "matdoidge/alakazam"' /data/options.json)
     GITHUB_BRANCH=$(jq -r '.github_branch // "main"' /data/options.json)
+    BUILD_PATH=$(jq -r '.build_path // "dist"' /data/options.json)
 else
     UPDATE_INTERVAL=3600
-    GITHUB_REPO="matdoidge/alakazam-dashboard"
+    GITHUB_REPO="matdoidge/alakazam"
     GITHUB_BRANCH="main"
+    BUILD_PATH="dist"
 fi
 
 export GITHUB_REPO
 export GITHUB_BRANCH
+export BUILD_PATH
 
 # Initial update
 echo "Performing initial dashboard update..."

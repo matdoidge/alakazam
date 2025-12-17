@@ -7,6 +7,7 @@ node_modules
 .wrangler
 /.svelte-kit
 /build
+# dist/ is committed to the repo for the add-on to download
 
 # OS
 .DS_Store

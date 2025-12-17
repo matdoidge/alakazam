@@ -7,7 +7,6 @@ export default defineConfig({
 		host: true
 	},
 	build: {
-		// Inline all assets into the HTML file for single-file deployment (HACS compatible)
-		assetsInlineLimit: Infinity
+		// Standard build - no need for single-file bundling with add-on
 	}
 });

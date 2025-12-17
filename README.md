@@ -26,9 +26,8 @@ A beautiful, modern dashboard for Home Assistant built with SvelteKit.
 1. In Home Assistant, go to **Settings** → **Add-ons** → **Add-on Store**
 2. Click the three dots (⋮) in the top right → **Repositories**
 3. Add: `https://github.com/matdoidge/alakazam`
-2. Go to **Settings** → **Add-ons** → **Add-on Store**
-3. Find **Alakazam Dashboard** and click **Install**
-4. Click **Start** and then **Open Web UI**
+4. Find **Alakazam Dashboard** and click **Install**
+5. Click **Start** and then **Open Web UI**
 
 **Benefits:**
 - ✅ No HACS required
