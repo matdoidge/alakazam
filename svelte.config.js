@@ -17,6 +17,10 @@ const config = {
 		// Use relative paths so the app works when served from a subdirectory (like /hacsfiles/alakazam-dashboard/)
 		paths: {
 			relative: true
+		},
+		// Bundle everything into a single HTML file for HACS compatibility
+		output: {
+			bundleStrategy: 'inline'
 		}
 	}
 };

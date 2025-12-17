@@ -7,15 +7,7 @@ export default defineConfig({
 		host: true
 	},
 	build: {
-		// Ensure assets are built with correct paths for HACS
-		assetsInlineLimit: 0, // Don't inline small assets
-		rollupOptions: {
-			output: {
-				// Use relative paths for assets
-				assetFileNames: '_app/immutable/assets/[name]-[hash][extname]',
-				chunkFileNames: '_app/immutable/chunks/[name]-[hash].js',
-				entryFileNames: '_app/immutable/entry/[name]-[hash].js'
-			}
-		}
+		// Inline all assets into the HTML file for single-file deployment (HACS compatible)
+		assetsInlineLimit: Infinity
 	}
 });
