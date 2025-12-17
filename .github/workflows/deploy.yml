@@ -60,15 +60,13 @@ jobs:
           echo "Checking for index.html:"
           ls -la build/index.html || echo "✗ index.html not found"
 
-      - name: Copy README to build and verify hacs.json
+      - name: Copy README to build
         run: |
-          cp README.md build/ || echo "README.md not found, skipping"
-          if [ -f "build/hacs.json" ]; then
-            echo "✓ hacs.json found in build output"
-          elif [ -f "static/hacs.json" ]; then
-            cp static/hacs.json build/ && echo "✓ Copied hacs.json from static/"
+          # Use dist-specific README if it exists, otherwise use main README
+          if [ -f "README.dist.md" ]; then
+            cp README.dist.md build/README.md && echo "✓ Copied dist-specific README"
           else
-            echo "⚠ Warning: hacs.json not found"
+            cp README.md build/ || echo "README.md not found, skipping"
           fi
 
 

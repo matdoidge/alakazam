@@ -1,7 +1,0 @@
-{
-  "name": "Alakazam Dashboard",
-  "content_in_root": true,
-  "filename": "index.html",
-  "render_readme": true,
-  "homeassistant": "2023.1.0"
-}
