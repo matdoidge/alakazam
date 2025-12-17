@@ -20,11 +20,12 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY update.sh /usr/bin/update-dashboard.sh
 RUN chmod +x /usr/bin/update-dashboard.sh
 
-# Expose port
-EXPOSE 8080
-
-# Start script
+# Copy start script
 COPY run.sh /usr/bin/run.sh
 RUN chmod +x /usr/bin/run.sh
 
-CMD [ "/usr/bin/run.sh" ]
+# Copy s6-overlay service files
+COPY rootfs/ /
+
+# Expose port
+EXPOSE 8080

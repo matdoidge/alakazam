@@ -336,17 +336,6 @@
 					</div>
 				</section>
 			{/each}
-
-			<section class="section">
-				<h2>Debug: Available People</h2>
-				<div class="debug-list">
-					{#each Object.keys($entities).filter((k) => k.startsWith("light.") || k.startsWith("switch.") || k.startsWith("sensor.ucg")) as validId}
-						<div class="debug-item">
-							<strong>{validId}</strong>: {$entities[validId].state}
-						</div>
-					{/each}
-				</div>
-			</section>
 		</main>
 	</main>
 </div>

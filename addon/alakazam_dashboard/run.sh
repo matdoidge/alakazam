@@ -1,5 +1,4 @@
-#!/bin/sh
-set -e
+#!/usr/bin/with-contenv sh
 
 # Load options
 if [ -f /data/options.json ]; then
