@@ -16,7 +16,22 @@ A beautiful, modern dashboard for Home Assistant built with SvelteKit.
 
 ## Installation
 
-### Via HACS (Recommended)
+### Via Home Assistant Add-on (Recommended - No HACS Required!)
+
+[![Open your Home Assistant instance and add my add-on repository.](https://my.home-assistant.io/badges/supervisor_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_addon_repository/?repository_url=https://github.com/matdoidge/alakazam)
+
+1. Click the button above (or manually add the repository: `https://github.com/matdoidge/alakazam`)
+2. Go to **Settings** → **Add-ons** → **Add-on Store**
+3. Find **Alakazam Dashboard** and click **Install**
+4. Click **Start** and then **Open Web UI**
+
+**Benefits:**
+- ✅ No HACS required
+- ✅ Auto-updates from GitHub
+- ✅ Proper MIME types (no errors!)
+- ✅ Works out of the box
+
+### Via HACS (Alternative)
 
 1. Open HACS in Home Assistant
 2. Go to **Frontend** → **Explore & Download Repositories**
@@ -36,6 +51,12 @@ A beautiful, modern dashboard for Home Assistant built with SvelteKit.
 
 ## Usage
 
+### If installed via Add-on:
+1. Simply click **Open Web UI** in the add-on
+2. Or add to your dashboard as an iframe:
+   - URL: `http://homeassistant.local:8080` (or use Ingress URL)
+
+### If installed via HACS or Manual:
 1. After installation, go to **Settings** → **Dashboards**
 2. Create a new dashboard or edit an existing one
 3. Add a card with type: **Manual** or use the **Panel** view
