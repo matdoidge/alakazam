@@ -24,16 +24,30 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Rename _app to app for HACS compatibility
+        run: |
+          # HACS doesn't download directories starting with underscore
+          # Rename _app to app and update all references
+          if [ -d "build/_app" ]; then
+            echo "Renaming _app to app for HACS compatibility..."
+            mv build/_app build/app
+            echo "✓ Renamed _app directory to app"
+          else
+            echo "⚠ _app directory not found, skipping rename"
+          fi
+
       - name: Fix paths in build output for subdirectory deployment
         run: |
           # Fix absolute paths to relative paths in index.html
+          # Also update _app references to app
           if [ -f "build/index.html" ]; then
+            # Replace _app with app (for HACS compatibility)
+            sed -i.bak 's|_app/|app/|g' build/index.html
             # Replace absolute paths with relative paths
-            # Handle script and link tags with /_app/ paths
-            sed -i.bak 's|src="/_app/|src="./_app/|g' build/index.html
-            sed -i.bak 's|href="/_app/|href="./_app/|g' build/index.html
-            sed -i.bak 's|"/_app/|"./_app/|g' build/index.html
-            sed -i.bak "s|'/_app/|'./_app/|g" build/index.html
+            sed -i.bak 's|src="/app/|src="./app/|g' build/index.html
+            sed -i.bak 's|href="/app/|href="./app/|g' build/index.html
+            sed -i.bak 's|"/app/|"./app/|g' build/index.html
+            sed -i.bak "s|'/app/|'./app/|g" build/index.html
             # Also handle any other absolute paths that might exist
             sed -i.bak 's|href="/|href="./|g' build/index.html
             sed -i.bak 's|src="/|src="./|g' build/index.html
@@ -46,13 +60,35 @@ jobs:
             grep -o 'src="[^"]*"' build/index.html | head -3 || true
           fi
           # Also fix paths in JavaScript files if they exist
-          find build/_app -name "*.js" -type f 2>/dev/null | while read file; do
-            sed -i.bak 's|"/_app/|"./_app/|g' "$file" 2>/dev/null || true
-            sed -i.bak "s|'/_app/|'./_app/|g" "$file" 2>/dev/null || true
-            sed -i.bak 's|/_app/|./_app/|g' "$file" 2>/dev/null || true
-            rm -f "${file}.bak" 2>/dev/null || true
-          done
-          echo "✓ Fixed paths in JavaScript files"
+          if [ -d "build/app" ]; then
+            find build/app -name "*.js" -type f 2>/dev/null | while read file; do
+              sed -i.bak 's|_app/|app/|g' "$file" 2>/dev/null || true
+              sed -i.bak 's|"/app/|"./app/|g' "$file" 2>/dev/null || true
+              sed -i.bak "s|'/app/|'./app/|g" "$file" 2>/dev/null || true
+              sed -i.bak 's|/app/|./app/|g' "$file" 2>/dev/null || true
+              rm -f "${file}.bak" 2>/dev/null || true
+            done
+            echo "✓ Fixed paths in JavaScript files"
+          fi
+
+      - name: Verify build output structure
+        run: |
+          echo "Build directory contents:"
+          ls -la build/ || echo "Build directory not found!"
+          echo ""
+          echo "Checking for _app directory (before rename):"
+          if [ -d "build/_app" ]; then
+            echo "✓ _app directory exists"
+            echo "_app contents:"
+            ls -la build/_app/ | head -10
+          else
+            echo "✗ _app directory NOT FOUND!"
+            echo "Looking for alternative build output..."
+            find build -type d -name "*app*" 2>/dev/null || echo "No app directories found"
+          fi
+          echo ""
+          echo "Checking for index.html:"
+          ls -la build/index.html || echo "✗ index.html not found"
 
       - name: Copy README to build and verify hacs.json
         run: |
@@ -65,6 +101,17 @@ jobs:
             echo "⚠ Warning: hacs.json not found"
           fi
 
+      - name: Ensure app directory is included
+        run: |
+          if [ ! -d "build/app" ]; then
+            echo "ERROR: app directory not found in build output!"
+            exit 1
+          fi
+          echo "✓ app directory confirmed in build output"
+          # Count files in app to verify it's not empty
+          file_count=$(find build/app -type f | wc -l)
+          echo "Found $file_count files in app directory"
+
       - name: Deploy to Dist Repo
         uses: cpina/github-action-push-to-another-repository@v1.5.1
         env:
@@ -75,3 +122,4 @@ jobs:
           destination-repository-name: ${{ secrets.DIST_REPO_NAME }}
           user-email: ${{ secrets.DIST_REPO_EMAIL }}
           target-branch: 'main'
+          git-push-arguments: '--force'
