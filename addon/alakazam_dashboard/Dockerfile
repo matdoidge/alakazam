@@ -1,14 +1,14 @@
 ARG BUILD_FROM
 FROM $BUILD_FROM
 
-# Install nginx, git, and unzip
+# Install nginx, git, curl, jq, and unzip
 RUN \
     apk add --no-cache \
-        nginx \
-        git \
-        curl \
-        jq \
-        unzip
+    nginx \
+    git \
+    curl \
+    jq \
+    unzip
 
 # Create directories
 RUN mkdir -p /usr/share/nginx/html /data

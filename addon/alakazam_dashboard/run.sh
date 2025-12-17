@@ -6,12 +6,12 @@ if [ -f /data/options.json ]; then
     UPDATE_INTERVAL=$(jq -r '.update_interval // 3600' /data/options.json)
     GITHUB_REPO=$(jq -r '.github_repo // "matdoidge/alakazam"' /data/options.json)
     GITHUB_BRANCH=$(jq -r '.github_branch // "main"' /data/options.json)
-    BUILD_PATH=$(jq -r '.build_path // "dist"' /data/options.json)
+    BUILD_PATH=$(jq -r '.build_path // "build"' /data/options.json)
 else
     UPDATE_INTERVAL=3600
     GITHUB_REPO="matdoidge/alakazam"
     GITHUB_BRANCH="main"
-    BUILD_PATH="dist"
+    BUILD_PATH="build"
 fi
 
 export GITHUB_REPO
@@ -20,7 +20,7 @@ export BUILD_PATH
 
 # Initial update
 echo "Performing initial dashboard update..."
-/usr/bin/update-dashboard.sh || echo "Initial update failed, continuing with existing files"
+/usr/bin/update-dashboard.sh || echo "Initial update failed, check logs"
 
 # Start update loop in background
 (

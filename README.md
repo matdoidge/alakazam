@@ -67,11 +67,34 @@ The dashboard will automatically connect to your Home Assistant instance. On fir
 If you encounter any issues with the add-on:
 
 1. **Check add-on logs**: Go to the add-on page and click **Logs**
-2. **Verify the build**: The add-on downloads from `alakazam-dashboard` repo - ensure the workflow has completed
+2. **Verify the build**: Make sure you've built locally (`npm run build`) and committed the `build/` folder to the repo
 3. **Restart the add-on**: Stop and start the add-on if updates aren't appearing
-4. **Check configuration**: Verify the `github_repo` and `github_branch` settings match your repository
+4. **Check configuration**: Verify the `github_repo`, `github_branch`, and `build_path` settings match your repository
 
 ## Development
+
+### Building Locally
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Build the dashboard:
+   ```bash
+   npm run build
+   ```
+
+3. **Commit the `build/` folder** to the repository:
+   ```bash
+   git add build/
+   git commit -m "Update build"
+   git push
+   ```
+
+The add-on will automatically download and serve the latest build from the `build/` folder in your repository.
+
+### Tech Stack
 
 This dashboard is built with:
 - [SvelteKit](https://kit.svelte.dev/)

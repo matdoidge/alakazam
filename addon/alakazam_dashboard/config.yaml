@@ -20,7 +20,7 @@ options:
   update_interval: 3600
   github_repo: "matdoidge/alakazam"
   github_branch: "main"
-  build_path: "dist"
+  build_path: "build"
 schema:
   update_interval: int?
   github_repo: str?
