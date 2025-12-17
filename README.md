@@ -48,9 +48,18 @@ A beautiful, modern dashboard for Home Assistant built with SvelteKit.
 ## Usage
 
 ### If installed via Add-on:
-1. Simply click **Open Web UI** in the add-on
-2. Or add to your dashboard as an iframe:
-   - URL: `http://homeassistant.local:8080` (or use Ingress URL)
+1. **Access directly via port 8080:**
+   - URL: `http://homeassistant.local:8080` (or `http://YOUR_HA_IP:8080`)
+   - Replace `homeassistant.local` with your Home Assistant IP address if needed
+
+2. **Add to your dashboard as an iframe:**
+   ```yaml
+   type: iframe
+   url: http://homeassistant.local:8080
+   title: Alakazam Dashboard
+   ```
+
+**Note:** Ingress is disabled to avoid MIME type issues. Access the dashboard directly via port 8080.
 
 ### If installed manually:
 1. After installation, go to **Settings** → **Dashboards**

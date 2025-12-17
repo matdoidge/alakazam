@@ -13,10 +13,9 @@ arch:
 startup: services
 boot: auto
 init: false
-ingress: true
-ingress_port: 8080
+ingress: false
 ports:
-  "8080/tcp": null
+  "8080/tcp": 8080
 options:
   update_interval: 3600
   github_repo: "matdoidge/alakazam"
