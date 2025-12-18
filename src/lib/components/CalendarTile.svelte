@@ -56,13 +56,42 @@
 			}
 
 			// Sort by start time and limit
+			// Properly handle date-only (all-day) vs dateTime events with timezone awareness
 			events = fetchedEvents
-				.sort((a, b) => {
-					const aStart = new Date(a.start?.dateTime || a.start?.date || 0);
-					const bStart = new Date(b.start?.dateTime || b.start?.date || 0);
-					return aStart.getTime() - bStart.getTime();
+				.map((event) => {
+					// Normalize the start date for consistent sorting
+					const startStr = event.start?.dateTime || event.start?.date;
+					if (!startStr) return { event, sortKey: Infinity };
+
+					// For date-only strings (YYYY-MM-DD), create a date at local midnight
+					// This avoids timezone issues where "2024-12-18" might be parsed as UTC
+					let sortDate: Date;
+					if (startStr.includes("T")) {
+						// Has time component - parse normally
+						sortDate = new Date(startStr);
+					} else {
+						// Date-only: create date at local midnight to avoid timezone issues
+						const [year, month, day] = startStr.split("-").map(Number);
+						sortDate = new Date(year, month - 1, day, 0, 0, 0, 0);
+					}
+
+					return {
+						event,
+						sortKey: sortDate.getTime(),
+					};
 				})
+				.sort((a, b) => a.sortKey - b.sortKey)
+				.map((item) => item.event)
 				.slice(0, maxEvents);
+
+			console.log(
+				"Sorted events order:",
+				events.map((e) => ({
+					summary: e.summary || e.title,
+					date: formatEventDate(e),
+					start: e.start?.dateTime || e.start?.date,
+				}))
+			);
 
 			console.log("Processed events:", events.length);
 		} catch (err: any) {
