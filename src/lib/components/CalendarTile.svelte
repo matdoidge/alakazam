@@ -57,41 +57,134 @@
 
 			// Sort by start time and limit
 			// Properly handle date-only (all-day) vs dateTime events with timezone awareness
+			const now = new Date();
+			const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+			const todayDayKey = todayStart.getTime();
+
 			events = fetchedEvents
 				.map((event) => {
 					// Normalize the start date for consistent sorting
-					const startStr = event.start?.dateTime || event.start?.date;
-					if (!startStr) return { event, sortKey: Infinity };
+					// Handle both formats: string directly or object with dateTime/date
+					const startStr =
+						typeof event.start === "string"
+							? event.start
+							: event.start?.dateTime || event.start?.date;
+					if (!startStr) return { event, sortKey: Infinity, dayKey: Infinity };
 
-					// For date-only strings (YYYY-MM-DD), create a date at local midnight
-					// This avoids timezone issues where "2024-12-18" might be parsed as UTC
+					// Parse the date - handle both UTC and local times
 					let sortDate: Date;
+					let dayKey: number;
+
 					if (startStr.includes("T")) {
-						// Has time component - parse normally
+						// Has time component - parse normally (handles UTC automatically)
 						sortDate = new Date(startStr);
+
+						// Extract the LOCAL day from the parsed date (after timezone conversion)
+						// This ensures we group by the day the user actually sees
+						const localYear = sortDate.getFullYear();
+						const localMonth = sortDate.getMonth();
+						const localDay = sortDate.getDate();
+						dayKey = new Date(localYear, localMonth, localDay, 0, 0, 0, 0).getTime();
 					} else {
 						// Date-only: create date at local midnight to avoid timezone issues
 						const [year, month, day] = startStr.split("-").map(Number);
 						sortDate = new Date(year, month - 1, day, 0, 0, 0, 0);
+						dayKey = sortDate.getTime();
 					}
 
 					return {
 						event,
-						sortKey: sortDate.getTime(),
+						sortKey: sortDate.getTime(), // Full timestamp for time-based sorting
+						dayKey: dayKey, // Day-only for grouping (local timezone)
+						sortDate: sortDate,
 					};
 				})
-				.sort((a, b) => a.sortKey - b.sortKey)
+				.sort((a, b) => {
+					// Primary sort: by day (group same-day events together)
+					const dayDiff = a.dayKey - b.dayKey;
+					if (dayDiff !== 0) return dayDiff;
+
+					// Secondary sort: within same day, all-day events come first
+					const aIsAllDay = isAllDayEvent(a.event);
+					const bIsAllDay = isAllDayEvent(b.event);
+					if (aIsAllDay && !bIsAllDay) return -1;
+					if (!aIsAllDay && bIsAllDay) return 1;
+
+					// Tertiary sort: by time within the same day
+					return a.sortKey - b.sortKey;
+				})
 				.map((item) => item.event)
 				.slice(0, maxEvents);
 
-			console.log(
-				"Sorted events order:",
-				events.map((e) => ({
+			console.log("Today start:", todayStart.toISOString(), "dayKey:", todayDayKey);
+			console.log("Raw fetched events:", fetchedEvents);
+
+			// Log the mapped events with their dayKeys before sorting
+			const mappedEvents = fetchedEvents.map((event) => {
+				const startStr =
+					typeof event.start === "string"
+						? event.start
+						: event.start?.dateTime || event.start?.date;
+				if (!startStr) return { event, sortKey: Infinity, dayKey: Infinity };
+
+				let sortDate: Date;
+				let dayKey: number;
+				if (startStr.includes("T")) {
+					sortDate = new Date(startStr);
+					const localYear = sortDate.getFullYear();
+					const localMonth = sortDate.getMonth();
+					const localDay = sortDate.getDate();
+					dayKey = new Date(localYear, localMonth, localDay, 0, 0, 0, 0).getTime();
+				} else {
+					const [year, month, day] = startStr.split("-").map(Number);
+					sortDate = new Date(year, month - 1, day, 0, 0, 0, 0);
+					dayKey = sortDate.getTime();
+				}
+				return { event, sortKey: sortDate.getTime(), dayKey };
+			});
+
+			const mappedEventsDebug = mappedEvents.map((m) => ({
+				summary: m.event.summary || m.event.title,
+				start:
+					typeof m.event.start === "string"
+						? m.event.start
+						: m.event.start?.dateTime || m.event.start?.date,
+				dayKey: m.dayKey,
+				dayKeyDate: new Date(m.dayKey).toLocaleDateString(),
+				sortKey: m.sortKey,
+			}));
+			console.log("Mapped events (before sort):", mappedEventsDebug);
+			console.table(mappedEventsDebug); // Table view for easier reading
+
+			// Print each event's dayKey for easy comparison
+			mappedEventsDebug.forEach((m, i) => {
+				console.log(
+					`Event ${i}: "${m.summary}" - dayKey: ${m.dayKey} (${m.dayKeyDate}), todayDayKey: ${todayDayKey}, match: ${m.dayKey === todayDayKey ? "TODAY" : m.dayKey > todayDayKey ? "FUTURE" : "PAST"}`
+				);
+			});
+
+			const sortedEventsDebug = events.map((e) => {
+				const startStr = typeof e.start === "string" ? e.start : e.start?.dateTime || e.start?.date;
+				let eventDate: Date;
+				if (startStr?.includes("T")) {
+					eventDate = new Date(startStr);
+				} else if (startStr) {
+					const [y, m, d] = startStr.split("-").map(Number);
+					eventDate = new Date(y, m - 1, d, 0, 0, 0, 0);
+				} else {
+					eventDate = new Date(0);
+				}
+				return {
 					summary: e.summary || e.title,
-					date: formatEventDate(e),
-					start: e.start?.dateTime || e.start?.date,
-				}))
-			);
+					dateLabel: formatEventDate(e),
+					start: startStr,
+					eventDate: eventDate.toISOString(),
+					eventDateLocal: eventDate.toLocaleString(),
+					isAllDay: isAllDayEvent(e),
+				};
+			});
+			console.log("Sorted events order:", sortedEventsDebug);
+			console.table(sortedEventsDebug); // Table view for easier reading
 
 			console.log("Processed events:", events.length);
 		} catch (err: any) {
@@ -113,11 +206,13 @@
 	function isAllDayEvent(event: any): boolean {
 		// Try multiple possible property names
 		const start =
-			event.start?.date ||
-			event.start?.dateTime ||
-			event.start_time ||
-			event.dtstart ||
-			event.start;
+			typeof event.start === "string"
+				? event.start
+				: event.start?.date ||
+					event.start?.dateTime ||
+					event.start_time ||
+					event.dtstart ||
+					event.start;
 
 		if (!start) return false;
 
@@ -134,11 +229,13 @@
 	function formatEventDate(event: any): string {
 		// Try multiple possible property names for the start date
 		const start =
-			event.start?.dateTime ||
-			event.start?.date ||
-			event.start_time ||
-			event.dtstart ||
-			event.start;
+			typeof event.start === "string"
+				? event.start
+				: event.start?.dateTime ||
+					event.start?.date ||
+					event.start_time ||
+					event.dtstart ||
+					event.start;
 
 		if (!start) {
 			console.warn("No start date found in event:", event);
@@ -191,11 +288,13 @@
 	function formatEventTime(event: any): string {
 		// Try multiple possible property names for the start date
 		const start =
-			event.start?.dateTime ||
-			event.start?.date ||
-			event.start_time ||
-			event.dtstart ||
-			event.start;
+			typeof event.start === "string"
+				? event.start
+				: event.start?.dateTime ||
+					event.start?.date ||
+					event.start_time ||
+					event.dtstart ||
+					event.start;
 
 		if (!start) return "";
 
@@ -223,7 +322,9 @@
 	function formatEventEndTime(event: any): string {
 		// Try multiple possible property names for the end date
 		const end =
-			event.end?.dateTime || event.end?.date || event.end_time || event.dtend || event.end;
+			typeof event.end === "string"
+				? event.end
+				: event.end?.dateTime || event.end?.date || event.end_time || event.dtend || event.end;
 
 		if (!end) return "";
 
@@ -249,8 +350,9 @@
 	}
 
 	function formatEventDuration(event: any): string {
-		const start = event.start?.dateTime || event.start?.date;
-		const end = event.end?.dateTime || event.end?.date;
+		const start =
+			typeof event.start === "string" ? event.start : event.start?.dateTime || event.start?.date;
+		const end = typeof event.end === "string" ? event.end : event.end?.dateTime || event.end?.date;
 
 		if (!start || !end) return "";
 
@@ -404,8 +506,11 @@
 
 	.events-list {
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
 		gap: 0.75rem;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		align-items: stretch;
 		width: 100%;
 	}
 
@@ -418,7 +523,9 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
-		width: 100%;
+		flex: 1 1 200px;
+		min-width: 200px;
+		max-width: 250px;
 		align-items: stretch;
 		height: auto;
 	}

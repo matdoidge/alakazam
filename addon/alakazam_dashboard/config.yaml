@@ -21,8 +21,10 @@ options:
   github_repo: "matdoidge/alakazam"
   github_branch: "main"
   build_path: "build"
+  dashboard_config: ""
 schema:
   update_interval: int?
   github_repo: str?
   github_branch: str?
   build_path: str?
+  dashboard_config: str?

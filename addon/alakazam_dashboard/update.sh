@@ -28,14 +28,33 @@ BUILD_DIR="${EXTRACTED_DIR}/${BUILD_PATH}"
 # Copy files to web root
 if [ -f "${BUILD_DIR}/index.html" ]; then
     echo "Copying files from ${BUILD_PATH} to web root..."
+    
+    # Preserve user's config.json if it exists (from add-on configuration)
+    if [ -f "${WEB_ROOT}/config.json" ]; then
+        echo "  Preserving existing config.json..."
+        cp "${WEB_ROOT}/config.json" "${WEB_ROOT}/config.json.bak" 2>/dev/null || true
+    fi
+    
     # Clear web root first
     rm -rf "${WEB_ROOT}"/*
+    
     # Copy all files from build directory
     cp -r "${BUILD_DIR}"/* "${WEB_ROOT}/" 2>/dev/null || true
+    
+    # Restore user's config.json if it was backed up
+    if [ -f "${WEB_ROOT}/config.json.bak" ]; then
+        echo "  Restoring user config.json..."
+        mv "${WEB_ROOT}/config.json.bak" "${WEB_ROOT}/config.json" || true
+    fi
+    
+    # Write config from add-on configuration (this will overwrite restored config if present)
+    /usr/bin/write-config.sh
+    
     # Ensure index.html exists
     if [ ! -f "${WEB_ROOT}/index.html" ]; then
         cp "${BUILD_DIR}/index.html" "${WEB_ROOT}/" || exit 1
     fi
+    
     echo "✓ Dashboard updated successfully"
     echo "  Files in web root: $(ls -1 ${WEB_ROOT} | wc -l)"
 else

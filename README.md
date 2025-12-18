@@ -71,6 +71,105 @@ A beautiful, modern dashboard for Home Assistant built with SvelteKit.
 
 The dashboard will automatically connect to your Home Assistant instance. On first use, you'll be prompted to authenticate.
 
+### Security & Privacy
+
+**Your data is safe!** The dashboard uses Home Assistant's built-in authentication system and respects all Home Assistant permissions. Your calendar and entity data are only accessible to authenticated users, just like Home Assistant's native dashboard.
+
+**Key Security Points:**
+- ✅ Uses Home Assistant's official authentication (same as the main UI)
+- ✅ Respects Home Assistant user permissions
+- ✅ No passwords or tokens stored in configuration files
+- ✅ All data stays within your Home Assistant instance
+- ✅ Same security model as Home Assistant's native dashboard
+
+**Important:** Keep port 8080 on your local network only. Don't expose it to the internet without proper security (VPN, reverse proxy with auth, etc.).
+
+See [SECURITY.md](SECURITY.md) for detailed security information.
+
+### Customizing Your Dashboard
+
+The dashboard is fully configurable! You can customize which entities, calendars, and rooms are displayed.
+
+#### Option 1: Using the Add-on Configuration Page (Recommended)
+
+1. **Open the add-on configuration:**
+   - Go to **Settings** → **Add-ons** → **Alakazam Dashboard**
+   - Click **Configuration** tab
+
+2. **Paste your dashboard config** in the `dashboard_config` field:
+   ```json
+   {
+     "people": [
+       {
+         "entityId": "person.your_person_entity",
+         "label": "Your Name",
+         "batteryEntityId": "sensor.your_battery_sensor"
+       }
+     ],
+     "rooms": {
+       "Living Room": [
+         { "type": "light", "entityId": "light.living_room", "label": "Living Room Light" },
+         { "type": "switch", "entityId": "switch.smart_plug", "label": "Smart Plug" }
+       ],
+       "Calendar": [
+         {
+           "type": "calendar",
+           "entityId": "calendar.your_calendar",
+           "label": "Upcoming Events",
+           "maxEvents": 5,
+           "daysAhead": 7,
+           "showTitle": true
+         }
+       ]
+     }
+   }
+   ```
+
+3. **Click "Save"** and **restart the add-on** - Your custom configuration will be loaded automatically!
+
+**Note:** The configuration is validated as JSON. If invalid, the dashboard will use defaults and show an error in the logs.
+
+#### Option 2: Manual File Editing (Advanced)
+
+If you prefer to edit files directly:
+
+1. SSH into your Home Assistant instance (or use the Terminal add-on)
+2. Navigate to: `/config/addons/data/alakazam_dashboard/`
+3. Edit `options.json` and add your config to the `dashboard_config` field
+4. Restart the add-on
+
+#### Option 3: Manual Installation (Without Add-on)
+
+1. Copy `config.example.json` from the repository to your installation directory
+2. Rename it to `config.json`
+3. Edit it with your entities
+4. Place it in the same directory as `index.html`
+
+#### Configuration Reference
+
+**People:**
+- `entityId`: Person entity ID (e.g., `person.john_doe`)
+- `label`: Display name
+- `batteryEntityId` (optional): Battery sensor entity ID
+
+**Rooms:** Each room is an object with an array of tiles:
+- `type`: One of: `light`, `switch`, `sensor`, `binary_sensor`, `media`, `arm`, `automation`, `calendar`, `statusGrid`
+- `entityId`: Entity ID for the tile
+- `label`: Display label
+- Additional properties depend on tile type (see examples below)
+
+**Tile Types:**
+
+- **Light**: `{ "type": "light", "entityId": "light.bedroom", "label": "Bedroom Light" }`
+- **Switch**: `{ "type": "switch", "entityId": "switch.smart_plug", "label": "Smart Plug" }`
+- **Sensor**: `{ "type": "sensor", "entityId": "sensor.temperature", "label": "Temperature", "unit": "°C" }`
+- **Binary Sensor**: `{ "type": "binary_sensor", "entityId": "binary_sensor.door", "label": "Front Door", "deviceClass": "door" }`
+- **Media Player**: `{ "type": "media", "entityId": "media_player.tv", "label": "TV", "temperatureEntityId": "sensor.tv_temp" }`
+- **Calendar**: `{ "type": "calendar", "entityId": "calendar.my_calendar", "label": "Events", "maxEvents": 5, "daysAhead": 7 }`
+- **Status Grid**: `{ "type": "statusGrid", "entityIds": ["binary_sensor.door1", "binary_sensor.door2"], "deviceClass": "door" }`
+
+**Note:** If no `config.json` is found, the dashboard will use the default configuration (Mat's setup) as a fallback.
+
 ## Troubleshooting
 
 If you encounter any issues with the add-on:

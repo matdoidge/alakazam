@@ -13,6 +13,7 @@
 	import { LightbulbOff, Moon, Sun } from "lucide-svelte";
 	import StatusGridTile from "$lib/components/StatusGridTile.svelte";
 	import CalendarTile from "$lib/components/CalendarTile.svelte";
+	import { loadConfig, getDefaultConfig, type DashboardConfig } from "$lib/config";
 
 	let now = $state(new Date());
 	let timeString = $derived(
@@ -31,6 +32,8 @@
 	);
 
 	let darkMode = $state(false);
+	let people = $state<DashboardConfig["people"]>([]);
+	let rooms = $state<DashboardConfig["rooms"]>({});
 
 	function toggleDarkMode() {
 		darkMode = !darkMode;
@@ -43,6 +46,23 @@
 	onMount(() => {
 		console.log("Alakazam Dashboard: Initializing...");
 		console.log("Current URL:", typeof window !== "undefined" ? window.location.href : "N/A");
+
+		// Load configuration (with fallback to defaults)
+		loadConfig()
+			.then((config) => {
+				people = config.people;
+				rooms = config.rooms;
+				console.log("Configuration loaded:", {
+					people: people.length,
+					rooms: Object.keys(rooms).length,
+				});
+			})
+			.catch((error) => {
+				console.error("Failed to load config, using defaults:", error);
+				const defaults = getDefaultConfig();
+				people = defaults.people;
+				rooms = defaults.rooms;
+			});
 
 		try {
 			connectToHA();
@@ -78,142 +98,6 @@
 			});
 		}
 	}
-
-	const people = [
-		{
-			entityId: "person.artfuldoidger",
-			label: "Mat",
-			batteryEntityId: "sensor.mats_iphone_battery_level",
-		},
-		{
-			entityId: "person.jessi",
-			label: "Jess",
-			batteryEntityId: "sensor.jessi_battery_level",
-		},
-	];
-	// ... rooms ... (unchanged)
-	const rooms = {
-		Security: [
-			{
-				type: "statusGrid",
-				// Add your sensor entity IDs here (binary_sensor.*, sensor.*, etc.)
-				entityIds: [
-					"binary_sensor.frontdoor_contact_sensor_contact",
-					// Add more sensors here, for example:
-					// "binary_sensor.backdoor_contact_sensor",
-					// "binary_sensor.garage_door_sensor",
-					// "binary_sensor.window_sensor_living_room",
-				],
-				// Optional: Custom labels for each sensor (uses friendly_name if not provided)
-				labels: {
-					"binary_sensor.frontdoor_contact_sensor_contact": "Front Door",
-					// Add custom labels here:
-					// "binary_sensor.backdoor_contact_sensor": "Back Door",
-				},
-				// Default device class for all sensors (can be: "door", "window", "motion", "garage", "problem")
-				deviceClass: "door",
-				// Optional: Override device class for specific sensors
-				// deviceClasses: {
-				// 	"binary_sensor.garage_door_sensor": "garage",
-				// 	"binary_sensor.window_sensor_living_room": "window",
-				// },
-				// Optional: Title for the status grid
-				// title: "Door Status",
-				// Optional: Show summary count (e.g., "3 sensors, 1 active")
-				showSummary: false,
-				// Optional: Hide unavailable sensors from display
-				// hideUnavailable: false,
-				// Optional: Sort with active/open sensors first (default: true)
-				// sortByState: true,
-			},
-			{
-				type: "arm",
-				entityId: "input_boolean.nighttime_door_warning",
-				label: "Arm Door Sensors",
-			},
-		],
-		// Example calendar tile - uncomment and configure with your calendar entity ID
-		// For CalDAV calendars, the entity ID is typically: calendar.caldav_* or calendar.*
-		// You can find your calendar entity ID in Home Assistant: Settings → Devices & Services → CalDAV
-		Calendar: [
-			{
-				type: "calendar",
-				entityId: "calendar.mat_and_jessi", // Your CalDAV calendar entity ID from Home Assistant
-				label: "Upcoming Events",
-				maxEvents: 5, // Number of events to show (default: 5)
-				daysAhead: 1, // How many days ahead to fetch (default: 7)
-				showTitle: false, // Hide the calendar title (default: true)
-			},
-		],
-		"Living Room": [
-			{ type: "media", entityId: "media_player.living_room_tv", label: "TV" },
-			{ type: "switch", entityId: "switch.innr_smart_plug_1", label: "Xmas TreeSmart Plug" },
-		],
-		"Master Bedroom": [
-			{ type: "light", entityId: "light.bedroom_lamp", label: "Mat Bedroom Lamp" },
-			{ type: "light", entityId: "light.mat_and_jess_light", label: "Mat & Jess Light Strip" },
-			{ type: "switch", entityId: "switch.0x0017880108e74ea6", label: "Mat & Jess Smart Plug" },
-			{ type: "media", entityId: "media_player.main_bedroom", label: "Apple TV" },
-		],
-		"Kids' Rooms": [
-			{ type: "light", entityId: "light.ellies_room", label: "Ellie's Light Bar" },
-			{
-				type: "media",
-				entityId: "media_player.ellie_s_daddy_s_house",
-				label: "Ellie's Yoto",
-				temperatureEntityId: "sensor.ellie_s_daddy_s_house_temperature", // Added temp support
-			},
-			{ type: "light", entityId: "light.poppys_light_strip_2", label: "Poppy's Light" },
-			{
-				type: "media",
-				entityId: "media_player.poppy_s_yoto",
-				label: "Poppy's Yoto",
-				temperatureEntityId: "sensor.poppy_s_yoto_temperature", // Added temp support
-			},
-			{ type: "light", entityId: "light.bens_bedside_lamp", label: "Ben's Lamp" },
-		],
-		Hallway: [
-			{
-				type: "binary_sensor",
-				entityId: "binary_sensor.frontdoor_contact_sensor_contact",
-				label: "Front Door",
-				deviceClass: "door",
-			},
-			{ type: "light", entityId: "light.hallway", label: "Hallway Light" },
-		],
-		Network: [
-			{ type: "sensor", entityId: "sensor.ucg_ultra_state", label: "UCG Ultra State" },
-			{ type: "sensor", entityId: "sensor.atom", label: "Atom Wifi", unit: "Clients" },
-			{ type: "sensor", entityId: "sensor.cerebro", label: "Cerebro Wifi", unit: "Clients" },
-			{
-				type: "sensor",
-				entityId: "sensor.ucg_ultra_ucg_ultra_cpu_temperature",
-				label: "UCG Ultra CPU Temp",
-				unit: "°C",
-			},
-		],
-		"Raspberry Pi Server": [
-			{
-				type: "sensor",
-				entityId: "sensor.system_monitor_last_boot",
-				label: "Last Boot",
-				format: "date",
-			},
-			{ type: "sensor", entityId: "sensor.system_monitor_disk_use", label: "Disk Use", unit: "%" },
-			{
-				type: "sensor",
-				entityId: "sensor.system_monitor_disk_free",
-				label: "Disk Free",
-				unit: "GB",
-			},
-			{
-				type: "sensor",
-				entityId: "sensor.system_monitor_processor_temperature",
-				label: "Processor Temp",
-				unit: "°C",
-			},
-		],
-	};
 </script>
 
 <div class="dashboard-container">

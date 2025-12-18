@@ -21,6 +21,9 @@ export BUILD_PATH
 echo "Performing initial dashboard update..."
 /usr/bin/update-dashboard.sh || echo "Initial update failed, check logs"
 
+# Write dashboard config from add-on configuration
+/usr/bin/write-config.sh
+
 # Start update loop in background
 (
     while true; do

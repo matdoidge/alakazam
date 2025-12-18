@@ -20,6 +20,10 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY update.sh /usr/bin/update-dashboard.sh
 RUN chmod +x /usr/bin/update-dashboard.sh
 
+# Copy config writer script
+COPY write-config.sh /usr/bin/write-config.sh
+RUN chmod +x /usr/bin/write-config.sh
+
 # Copy start script
 COPY run.sh /usr/bin/run.sh
 RUN chmod +x /usr/bin/run.sh

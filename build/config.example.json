@@ -1,0 +1,56 @@
+{
+  "people": [
+    {
+      "entityId": "person.artfuldoidger",
+      "label": "Mat",
+      "batteryEntityId": "sensor.mats_iphone_battery_level"
+    },
+    {
+      "entityId": "person.jessi",
+      "label": "Jess",
+      "batteryEntityId": "sensor.jessi_battery_level"
+    }
+  ],
+  "rooms": {
+    "Security": [
+      {
+        "type": "statusGrid",
+        "entityIds": [
+          "binary_sensor.frontdoor_contact_sensor_contact"
+        ],
+        "labels": {
+          "binary_sensor.frontdoor_contact_sensor_contact": "Front Door"
+        },
+        "deviceClass": "door",
+        "showSummary": false
+      },
+      {
+        "type": "arm",
+        "entityId": "input_boolean.nighttime_door_warning",
+        "label": "Arm Door Sensors"
+      }
+    ],
+    "Calendar": [
+      {
+        "type": "calendar",
+        "entityId": "calendar.mat_and_jessi",
+        "label": "Upcoming Events",
+        "maxEvents": 5,
+        "daysAhead": 1,
+        "showTitle": false
+      }
+    ],
+    "Living Room": [
+      {
+        "type": "media",
+        "entityId": "media_player.living_room_tv",
+        "label": "TV"
+      },
+      {
+        "type": "switch",
+        "entityId": "switch.innr_smart_plug_1",
+        "label": "Xmas TreeSmart Plug"
+      }
+    ]
+  }
+}
