@@ -375,11 +375,8 @@
 
 	.events-list {
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
 		gap: 0.75rem;
-		flex-wrap: wrap;
-		justify-content: flex-start;
-		align-items: stretch;
 		width: 100%;
 	}
 
@@ -392,9 +389,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
-		flex: 1 1 200px;
-		min-width: 200px;
-		max-width: 250px;
+		width: 100%;
 		align-items: stretch;
 		height: auto;
 	}
