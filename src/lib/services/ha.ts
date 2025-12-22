@@ -113,12 +113,17 @@ async function loadTokens() {
     if (saved) {
       try {
         const tokens = JSON.parse(saved);
-        // Check if tokens are still valid (not expired)
-        if (tokens.expires && tokens.expires > Date.now()) {
+        // Return tokens - let the library handle refresh/validation
+        // Long-Lived Access Tokens don't expire the same way, and the library
+        // will automatically refresh them if needed
+        if (tokens && tokens.access_token) {
+          console.log('Loaded saved tokens from localStorage');
           return tokens;
         }
       } catch (e) {
-        // Invalid tokens, continue to auth flow
+        console.warn('Failed to parse saved tokens:', e);
+        // Invalid tokens, clear them and continue to auth flow
+        localStorage.removeItem('hassTokens');
       }
     }
   }
@@ -129,8 +134,16 @@ async function loadTokens() {
 
 async function saveTokens(tokens: any) {
   if (typeof window !== 'undefined') {
-    localStorage.setItem('hassTokens', JSON.stringify(tokens));
-    localStorage.setItem('hassUrl', tokens.hassUrl);
+    try {
+      // Save tokens with all metadata for proper refresh handling
+      localStorage.setItem('hassTokens', JSON.stringify(tokens));
+      if (tokens.hassUrl) {
+        localStorage.setItem('hassUrl', tokens.hassUrl);
+      }
+      console.log('Saved authentication tokens to localStorage');
+    } catch (e) {
+      console.error('Failed to save tokens:', e);
+    }
   }
 }
 
@@ -139,10 +152,16 @@ export async function connectToHA() {
     const hassUrl = getHassUrl();
     console.log('Connecting to Home Assistant at:', hassUrl);
     
+    // Use getAuth with token loading/saving for persistent authentication
+    // The library will automatically:
+    // - Use saved tokens if valid
+    // - Refresh tokens if expired but refreshable
+    // - Prompt for new auth only if tokens are invalid/unrefreshable
     const auth = await getAuth({
       hassUrl,
       loadTokens,
-      saveTokens
+      saveTokens,
+      // Allow the library to handle token refresh automatically
     });
 
     console.log('Authentication successful, creating connection...');

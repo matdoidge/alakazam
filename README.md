@@ -71,6 +71,8 @@ A beautiful, modern dashboard for Home Assistant built with SvelteKit.
 
 The dashboard will automatically connect to your Home Assistant instance. On first use, you'll be prompted to authenticate.
 
+**💡 Important:** When authenticating, check **"Create a Long-Lived Access Token"** to ensure persistent login. Without this, you'll need to log in repeatedly.
+
 ### Security & Privacy
 
 **Your data is safe!** The dashboard uses Home Assistant's built-in authentication system and respects all Home Assistant permissions. Your calendar and entity data are only accessible to authenticated users, just like Home Assistant's native dashboard.
@@ -90,44 +92,69 @@ See [SECURITY.md](SECURITY.md) for detailed security information.
 
 The dashboard is fully configurable! You can customize which entities, calendars, and rooms are displayed.
 
-#### Option 1: Using the Add-on Configuration Page (Recommended)
+**📖 New to configuring?** See the [**Setup Guide**](SETUP_GUIDE.md) for step-by-step instructions and examples!
+
+#### Quick Start: Using the Add-on Configuration Page
 
 1. **Open the add-on configuration:**
    - Go to **Settings** → **Add-ons** → **Alakazam Dashboard**
    - Click **Configuration** tab
 
-2. **Paste your dashboard config** in the `dashboard_config` field:
-   ```json
-   {
-     "people": [
-       {
-         "entityId": "person.your_person_entity",
-         "label": "Your Name",
-         "batteryEntityId": "sensor.your_battery_sensor"
-       }
-     ],
-     "rooms": {
-       "Living Room": [
-         { "type": "light", "entityId": "light.living_room", "label": "Living Room Light" },
-         { "type": "switch", "entityId": "switch.smart_plug", "label": "Smart Plug" }
-       ],
-       "Calendar": [
-         {
-           "type": "calendar",
-           "entityId": "calendar.your_calendar",
-           "label": "Upcoming Events",
-           "maxEvents": 5,
-           "daysAhead": 7,
-           "showTitle": true
-         }
-       ]
-     }
-   }
-   ```
+2. **Paste your dashboard config** in the `dashboard_config` field (see examples below)
 
-3. **Click "Save"** and **restart the add-on** - Your custom configuration will be loaded automatically!
+3. **Click "Save"** and **restart the add-on**
 
 **Note:** The configuration is validated as JSON. If invalid, the dashboard will use defaults and show an error in the logs.
+
+#### Example Configurations
+
+**Minimal Example:**
+```json
+{
+  "people": [],
+  "rooms": {
+    "Living Room": [
+      { "type": "light", "entityId": "light.living_room", "label": "Living Room Light" }
+    ]
+  }
+}
+```
+
+**Complete Example:**
+```json
+{
+  "people": [
+    {
+      "entityId": "person.john_doe",
+      "label": "John",
+      "batteryEntityId": "sensor.john_phone_battery"
+    }
+  ],
+  "rooms": {
+    "Living Room": [
+      { "type": "light", "entityId": "light.living_room", "label": "Living Room Light" },
+      { "type": "switch", "entityId": "switch.smart_plug", "label": "Smart Plug" },
+      { "type": "media", "entityId": "media_player.tv", "label": "TV" }
+    ],
+    "Calendar": [
+      {
+        "type": "calendar",
+        "entityId": "calendar.my_calendar",
+        "label": "Upcoming Events",
+        "maxEvents": 5,
+        "daysAhead": 7
+      }
+    ]
+  }
+}
+```
+
+**See [SETUP_GUIDE.md](SETUP_GUIDE.md) for:**
+- Step-by-step setup instructions
+- How to find your entity IDs
+- More configuration examples
+- Common use cases
+- Troubleshooting tips
 
 #### Option 2: Manual File Editing (Advanced)
 

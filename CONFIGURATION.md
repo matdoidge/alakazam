@@ -2,6 +2,8 @@
 
 The Alakazam Dashboard is fully configurable! You can customize which entities, calendars, and rooms are displayed without modifying the source code.
 
+**📖 New to configuring?** Check out the [**Setup Guide**](SETUP_GUIDE.md) for step-by-step instructions, examples, and troubleshooting!
+
 ## Quick Start (Add-on Installation - Recommended)
 
 1. **Open the add-on configuration:**

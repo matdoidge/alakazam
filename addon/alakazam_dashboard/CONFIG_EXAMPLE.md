@@ -83,3 +83,4 @@ For calendars:
 - **automation**: `{ "type": "automation", "entityId": "automation.goodnight", "label": "Goodnight Scene" }`
 
 See [CONFIGURATION.md](../../CONFIGURATION.md) for full documentation.
+
