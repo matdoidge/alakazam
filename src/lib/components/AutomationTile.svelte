@@ -12,8 +12,9 @@
 
 	function toggle() {
 		if (!$connection) return;
-		const service = isOn ? "turn_off" : "turn_on";
-		callService($connection, "homeassistant", service, { entity_id: entityId });
+		callService($connection, "homeassistant", "toggle", {
+			entity_id: entityId,
+		});
 	}
 </script>
 

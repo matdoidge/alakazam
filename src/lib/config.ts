@@ -51,6 +51,7 @@ const DEFAULT_CONFIG = {
 		],
 		"Kids' Rooms": [
 			{ type: "light", entityId: "light.ellies_room", label: "Ellie's Light Bar" },
+			{ type: "automation", entityId: "automation.ellie_s_room_lights", label: "Ellie's Automation" },
 			{
 				type: "media",
 				entityId: "media_player.ellie_s_daddy_s_house",
