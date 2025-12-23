@@ -70,7 +70,7 @@ The `dashboard_config` in the add-on configuration contains:
 
 ### Configuration File Location
 
-- **Add-on config**: `/config/addons/data/alakazam_dashboard/options.json`
+- **Add-on config**: `/mnt/data/supervisor/addons/data/alakazam_dashboard/options.json` (on host system)
 - **Web config**: `/usr/share/nginx/html/config.json` (inside container)
 
 **Security Notes:**

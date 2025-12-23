@@ -1,5 +1,5 @@
 name: Alakazam Dashboard
-version: "1.0.1"
+version: "1.0.2"
 slug: alakazam_dashboard
 description: A beautiful, modern dashboard for Home Assistant built with SvelteKit
 url: https://github.com/matdoidge/alakazam

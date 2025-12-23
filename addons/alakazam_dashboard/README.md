@@ -18,6 +18,28 @@ A standalone Home Assistant add-on that serves the Alakazam Dashboard and auto-u
 4. Find **Alakazam Dashboard** and click **Install**
 5. Click **Start**
 
+## Updates
+
+Home Assistant will automatically detect when a new version of the add-on is available. To update:
+
+1. **Check for updates:**
+   - Go to **Settings** → **Add-ons** → **Add-on Store**
+   - Click the three dots (⋮) → **Check for Updates**
+   - Wait a few seconds for the repository to refresh
+
+2. **Update the add-on:**
+   - Go to **Settings** → **Add-ons** → **Alakazam Dashboard**
+   - If an update is available, you'll see an **Update** button
+   - Click **Update** and wait for it to complete
+   - The add-on will restart automatically
+
+**Note:** If updates don't appear:
+- Make sure you've **pushed changes to GitHub** (the version number in `config.yaml` must change)
+- Try **refreshing the repository** manually (three dots → Check for Updates)
+- Sometimes a **Supervisor restart** helps: Settings → System → Hardware → Restart Host
+
+**Dashboard Content Updates:** The dashboard content (HTML/JS files) updates automatically from GitHub every hour (configurable via `update_interval`). Add-on version updates require manual updating through the UI.
+
 ## Configuration
 
 ### Dashboard Configuration
@@ -46,20 +68,26 @@ The dashboard is fully configurable! You can customize which entities, calendars
 
 Since the add-on config field is single-line, here's an easier way to edit your configuration:
 
-**Option 1: Using File Editor Add-on (Easiest)**
-1. Install the **File Editor** add-on (if not already installed)
-2. Navigate to: `/config/addons/data/alakazam_dashboard/options.json`
-3. Edit the `dashboard_config` field - you'll have a full editor with syntax highlighting!
-4. Save and restart the Alakazam Dashboard add-on
+**Option 1: Using Terminal/SSH (Recommended)**
+1. SSH into Home Assistant or use the **Terminal** add-on
+2. Edit the options file:
+   ```bash
+   nano /mnt/data/supervisor/addons/data/alakazam_dashboard/options.json
+   ```
+3. Edit the `dashboard_config` field - you'll have a full editor!
+4. Save (Ctrl+O, Enter, Ctrl+X in nano) and restart the Alakazam Dashboard add-on
 
-**Option 2: Using Terminal/SSH**
-1. SSH into Home Assistant or use the Terminal add-on
-2. Edit: `/config/addons/data/alakazam_dashboard/options.json`
-3. Use your favorite editor (nano, vi, etc.)
-4. Restart the add-on
+**Option 2: Using Samba Share Add-on**
+1. Install the **Samba Share** add-on (Settings → Add-ons → Add-on Store → Samba Share)
+2. Enable and start it, then access via your file explorer (Windows: `\\homeassistant\config`)
+3. Navigate to: `/addons/data/alakazam_dashboard/options.json`
+4. Edit with your favorite text editor
+5. Restart the Alakazam Dashboard add-on
 
 **Option 3: Using the Single-Line Field**
-- You can paste multiline JSON into the single-line field - it will work, just harder to see
+- You can paste multiline JSON into the single-line field - it will work, just harder to see/edit
+
+**Note:** File Editor add-on cannot access add-on data directories (it's limited to `/config`), so use Terminal/SSH or Samba Share instead.
 
 #### Configuration Structure
 
@@ -264,7 +292,7 @@ Before configuring, you need to know your entity IDs:
 - `github_repo`: GitHub repository (default: `matdoidge/alakazam`)
 - `github_branch`: Branch to use (default: `main`)
 - `build_path`: Path to build directory (default: `build`)
-- `dashboard_config`: **Your dashboard configuration JSON** (single-line field - use File Editor for easier multiline editing)
+- `dashboard_config`: **Your dashboard configuration JSON** (single-line field - use Terminal/SSH or Samba Share for easier multiline editing)
 
 ## Usage
 
