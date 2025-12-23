@@ -90,7 +90,7 @@ See [SECURITY.md](SECURITY.md) for detailed security information.
 
 ### Customizing Your Dashboard
 
-The dashboard is fully configurable! You can customize which entities, calendars, and rooms are displayed.
+The dashboard is fully configurable! You can customize which entities, calendars, and rooms are displayed to match your Home Assistant setup.
 
 **📖 New to configuring?** See the [**Setup Guide**](SETUP_GUIDE.md) for step-by-step instructions and examples!
 
@@ -100,30 +100,44 @@ The dashboard is fully configurable! You can customize which entities, calendars
    - Go to **Settings** → **Add-ons** → **Alakazam Dashboard**
    - Click **Configuration** tab
 
-2. **Paste your dashboard config** in the `dashboard_config` field (a large text area - see examples below)
+2. **Find the `dashboard_config` field** - This is a **large 20-line textarea** perfect for editing JSON/YAML
 
-3. **Click "Save"** and **restart the add-on**
+3. **Paste your configuration** (see examples below)
 
-**Note:** 
-- The `dashboard_config` field is a large text area (20 lines) - perfect for editing JSON
-- The configuration is validated as JSON. If invalid, the dashboard will use defaults and show an error in the logs
-- If you leave `dashboard_config` empty, the dashboard will use the default configuration (Mat's setup)
+4. **Click "Save"** and **restart the add-on**
+
+**Important Notes:**
+- ✅ The `dashboard_config` field is a **large textarea (20 lines)** - easy to see and edit your full configuration
+- ✅ Configuration uses **JSON format** (not YAML) - use double quotes for strings
+- ✅ Configuration is validated automatically - if invalid, the dashboard uses defaults and shows an error in logs
+- ✅ **Leave `dashboard_config` empty** to use the default configuration (perfect for testing!)
+
+#### Configuration Structure
+
+Your configuration has two main sections:
+
+1. **`people`** - Array of person entities to display at the top
+2. **`rooms`** - Object where each key is a room name and value is an array of tiles
 
 #### Example Configurations
 
-**Minimal Example:**
+**Minimal Example (Single Room):**
 ```json
 {
   "people": [],
   "rooms": {
     "Living Room": [
-      { "type": "light", "entityId": "light.living_room", "label": "Living Room Light" }
+      {
+        "type": "light",
+        "entityId": "light.living_room",
+        "label": "Living Room Light"
+      }
     ]
   }
 }
 ```
 
-**Complete Example:**
+**Complete Example (Multiple Rooms):**
 ```json
 {
   "people": [
@@ -135,9 +149,34 @@ The dashboard is fully configurable! You can customize which entities, calendars
   ],
   "rooms": {
     "Living Room": [
-      { "type": "light", "entityId": "light.living_room", "label": "Living Room Light" },
-      { "type": "switch", "entityId": "switch.smart_plug", "label": "Smart Plug" },
-      { "type": "media", "entityId": "media_player.tv", "label": "TV" }
+      {
+        "type": "light",
+        "entityId": "light.living_room",
+        "label": "Living Room Light"
+      },
+      {
+        "type": "switch",
+        "entityId": "switch.smart_plug",
+        "label": "Smart Plug"
+      },
+      {
+        "type": "media",
+        "entityId": "media_player.tv",
+        "label": "TV"
+      }
+    ],
+    "Bedroom": [
+      {
+        "type": "light",
+        "entityId": "light.bedroom",
+        "label": "Bedroom Light"
+      },
+      {
+        "type": "sensor",
+        "entityId": "sensor.bedroom_temperature",
+        "label": "Temperature",
+        "unit": "°C"
+      }
     ],
     "Calendar": [
       {
@@ -145,60 +184,153 @@ The dashboard is fully configurable! You can customize which entities, calendars
         "entityId": "calendar.my_calendar",
         "label": "Upcoming Events",
         "maxEvents": 5,
-        "daysAhead": 7
+        "daysAhead": 7,
+        "showTitle": true
+      }
+    ],
+    "Security": [
+      {
+        "type": "statusGrid",
+        "entityIds": [
+          "binary_sensor.front_door",
+          "binary_sensor.back_door"
+        ],
+        "labels": {
+          "binary_sensor.front_door": "Front Door",
+          "binary_sensor.back_door": "Back Door"
+        },
+        "deviceClass": "door",
+        "showSummary": false
       }
     ]
   }
 }
 ```
 
+#### Finding Your Entity IDs
+
+Before configuring, you need to know your entity IDs:
+
+1. Go to **Settings** → **Devices & Services** → **Entities**
+2. Search for your device (e.g., "bedroom light")
+3. Click on the entity
+4. Copy the **Entity ID** (e.g., `light.bedroom_lamp`)
+
+**Common Entity Types:**
+- **Lights**: `light.bedroom_lamp`, `light.living_room`
+- **Switches**: `switch.smart_plug`, `switch.outlet`
+- **Sensors**: `sensor.temperature`, `sensor.humidity`
+- **Binary Sensors**: `binary_sensor.door`, `binary_sensor.motion`
+- **Media Players**: `media_player.tv`, `media_player.speaker`
+- **Calendars**: `calendar.my_calendar`, `calendar.google_calendar`
+- **Persons**: `person.john_doe`, `person.jane_doe`
+
+#### Available Tile Types
+
+| Type | Description | Required Fields | Optional Fields |
+|------|-------------|----------------|----------------|
+| `light` | Control lights with brightness | `entityId`, `label` | - |
+| `switch` | Control switches/plugs | `entityId`, `label` | - |
+| `sensor` | Display sensor values | `entityId`, `label` | `unit`, `format` |
+| `binary_sensor` | Show on/off states | `entityId`, `label` | `deviceClass` |
+| `media` | Control media players | `entityId`, `label` | `temperatureEntityId` |
+| `calendar` | Display calendar events | `entityId`, `label` | `maxEvents`, `daysAhead`, `showTitle` |
+| `statusGrid` | Grid of multiple sensors | `entityIds[]`, `deviceClass` | `labels`, `showSummary` |
+| `arm` | Security system control | `entityId`, `label` | - |
+| `automation` | Trigger automations | `entityId`, `label` | - |
+
 **See [SETUP_GUIDE.md](SETUP_GUIDE.md) for:**
-- Step-by-step setup instructions
-- How to find your entity IDs
+- Detailed step-by-step setup instructions
 - More configuration examples
-- Common use cases
+- Common use cases (lights only, security dashboard, media center, etc.)
 - Troubleshooting tips
 
-#### Option 2: Manual File Editing (Advanced)
+#### Configuration Tips
 
+**Getting Started:**
+1. Start simple - add one room with one light to test
+2. Use the default config as a reference - it shows all available tile types
+3. Copy and modify the examples above - replace entity IDs with your own
+4. Test incrementally - add one room at a time
+
+**Common Patterns:**
+
+**Room-by-Room Setup:**
+```json
+{
+  "people": [],
+  "rooms": {
+    "Kitchen": [
+      { "type": "light", "entityId": "light.kitchen", "label": "Kitchen Light" },
+      { "type": "switch", "entityId": "switch.coffee_maker", "label": "Coffee Maker" }
+    ],
+    "Bedroom": [
+      { "type": "light", "entityId": "light.bedroom", "label": "Bedroom Light" },
+      { "type": "sensor", "entityId": "sensor.bedroom_temperature", "label": "Temp", "unit": "°C" }
+    ]
+  }
+}
+```
+
+**Calendar Focus:**
+```json
+{
+  "people": [],
+  "rooms": {
+    "Calendar": [
+      {
+        "type": "calendar",
+        "entityId": "calendar.personal",
+        "label": "Personal Calendar",
+        "maxEvents": 10,
+        "daysAhead": 14
+      }
+    ]
+  }
+}
+```
+
+**Security Dashboard:**
+```json
+{
+  "people": [],
+  "rooms": {
+    "Security": [
+      {
+        "type": "statusGrid",
+        "entityIds": [
+          "binary_sensor.front_door",
+          "binary_sensor.back_door",
+          "binary_sensor.garage_door"
+        ],
+        "labels": {
+          "binary_sensor.front_door": "Front Door",
+          "binary_sensor.back_door": "Back Door"
+        },
+        "deviceClass": "door",
+        "showSummary": true
+      }
+    ]
+  }
+}
+```
+
+#### Advanced Options
+
+**Manual File Editing (Alternative Method):**
 If you prefer to edit files directly:
-
 1. SSH into your Home Assistant instance (or use the Terminal add-on)
 2. Navigate to: `/config/addons/data/alakazam_dashboard/`
 3. Edit `options.json` and add your config to the `dashboard_config` field
 4. Restart the add-on
 
-#### Option 3: Manual Installation (Without Add-on)
-
+**Manual Installation (Without Add-on):**
 1. Copy `config.example.json` from the repository to your installation directory
 2. Rename it to `config.json`
 3. Edit it with your entities
 4. Place it in the same directory as `index.html`
 
-#### Configuration Reference
-
-**People:**
-- `entityId`: Person entity ID (e.g., `person.john_doe`)
-- `label`: Display name
-- `batteryEntityId` (optional): Battery sensor entity ID
-
-**Rooms:** Each room is an object with an array of tiles:
-- `type`: One of: `light`, `switch`, `sensor`, `binary_sensor`, `media`, `arm`, `automation`, `calendar`, `statusGrid`
-- `entityId`: Entity ID for the tile
-- `label`: Display label
-- Additional properties depend on tile type (see examples below)
-
-**Tile Types:**
-
-- **Light**: `{ "type": "light", "entityId": "light.bedroom", "label": "Bedroom Light" }`
-- **Switch**: `{ "type": "switch", "entityId": "switch.smart_plug", "label": "Smart Plug" }`
-- **Sensor**: `{ "type": "sensor", "entityId": "sensor.temperature", "label": "Temperature", "unit": "°C" }`
-- **Binary Sensor**: `{ "type": "binary_sensor", "entityId": "binary_sensor.door", "label": "Front Door", "deviceClass": "door" }`
-- **Media Player**: `{ "type": "media", "entityId": "media_player.tv", "label": "TV", "temperatureEntityId": "sensor.tv_temp" }`
-- **Calendar**: `{ "type": "calendar", "entityId": "calendar.my_calendar", "label": "Events", "maxEvents": 5, "daysAhead": 7 }`
-- **Status Grid**: `{ "type": "statusGrid", "entityIds": ["binary_sensor.door1", "binary_sensor.door2"], "deviceClass": "door" }`
-
-**Note:** If no `config.json` is found, the dashboard will use the default configuration (Mat's setup) as a fallback.
+For complete documentation, see [CONFIGURATION.md](CONFIGURATION.md) and [SETUP_GUIDE.md](SETUP_GUIDE.md).
 
 ## Troubleshooting
 
