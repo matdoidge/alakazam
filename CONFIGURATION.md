@@ -10,11 +10,14 @@ The Alakazam Dashboard is fully configurable! You can customize which entities, 
    - Go to **Settings** → **Add-ons** → **Alakazam Dashboard**
    - Click the **Configuration** tab
 
-2. **Paste your dashboard config** in the `dashboard_config` field (see example below)
+2. **Paste your dashboard config** in the `dashboard_config` field (a large 20-line text area - perfect for editing JSON)
 
 3. **Click "Save"** and **restart the add-on** - Your configuration will be loaded automatically!
 
-**Note:** The configuration is validated as JSON. If invalid, the dashboard will use defaults and show an error in the logs.
+**Notes:**
+- The `dashboard_config` field is a large text area (20 lines) - easy to edit and paste JSON
+- The configuration is validated as JSON. If invalid, the dashboard will use defaults and show an error in the logs
+- **If you leave `dashboard_config` empty**, the dashboard will use the default configuration (Mat's setup) - perfect for testing!
 
 ## Configuration Methods
 

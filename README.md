@@ -100,11 +100,14 @@ The dashboard is fully configurable! You can customize which entities, calendars
    - Go to **Settings** → **Add-ons** → **Alakazam Dashboard**
    - Click **Configuration** tab
 
-2. **Paste your dashboard config** in the `dashboard_config` field (see examples below)
+2. **Paste your dashboard config** in the `dashboard_config` field (a large text area - see examples below)
 
 3. **Click "Save"** and **restart the add-on**
 
-**Note:** The configuration is validated as JSON. If invalid, the dashboard will use defaults and show an error in the logs.
+**Note:** 
+- The `dashboard_config` field is a large text area (20 lines) - perfect for editing JSON
+- The configuration is validated as JSON. If invalid, the dashboard will use defaults and show an error in the logs
+- If you leave `dashboard_config` empty, the dashboard will use the default configuration (Mat's setup)
 
 #### Example Configurations
 

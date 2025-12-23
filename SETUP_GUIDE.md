@@ -29,6 +29,8 @@ A step-by-step guide to setting up and configuring your Alakazam Dashboard.
 4. Enter your Home Assistant username and password
 5. **Important:** Check "Create a Long-Lived Access Token" for persistent login
 
+**Note:** By default, the dashboard will show Mat's configuration (all his entities and rooms). You can customize it in the next step, or use it as-is to see how it works!
+
 ## Initial Setup
 
 ### First Login
@@ -70,6 +72,15 @@ Before configuring the dashboard, you need to know your entity IDs. Here's how t
 - **Persons**: `person.john_doe`, `person.jane_doe`
 
 ## Configuration Examples
+
+### Default Behavior
+
+**If you don't configure anything:** The dashboard will automatically use the default configuration (Mat's setup) with all his entities, rooms, and calendars. This is perfect for:
+- Testing the dashboard
+- Seeing how it works
+- Using it as-is if you like the setup
+
+**To customize:** Follow the examples below and paste your configuration into the `dashboard_config` field in the add-on Configuration tab.
 
 ### Basic Configuration
 

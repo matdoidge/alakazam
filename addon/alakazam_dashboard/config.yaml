@@ -27,4 +27,9 @@ schema:
   github_repo: str?
   github_branch: str?
   build_path: str?
-  dashboard_config: str?
+  dashboard_config:
+    type: str
+    selector:
+      text:
+        multiline: true
+        lines: 20
