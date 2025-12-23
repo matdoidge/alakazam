@@ -10,25 +10,44 @@ The Alakazam Dashboard is fully configurable! You can customize which entities, 
    - Go to **Settings** → **Add-ons** → **Alakazam Dashboard**
    - Click the **Configuration** tab
 
-2. **Paste your dashboard config** in the `dashboard_config` field (a large 20-line text area - perfect for editing JSON)
+2. **Paste your dashboard config** in the `dashboard_config` field (single-line field - see "Easy Configuration Editing" below for better options)
 
 3. **Click "Save"** and **restart the add-on** - Your configuration will be loaded automatically!
 
 **Notes:**
-- The `dashboard_config` field is a large text area (20 lines) - easy to edit and paste JSON
-- The configuration is validated as JSON. If invalid, the dashboard will use defaults and show an error in the logs
-- **If you leave `dashboard_config` empty**, the dashboard will use the default configuration (Mat's setup) - perfect for testing!
+- ⚠️ The `dashboard_config` field is a **single-line text field** (Home Assistant add-ons don't support multiline textareas)
+- ✅ You can paste multiline JSON - it will work, but it's harder to see/edit
+- ✅ **Better option**: Use File Editor add-on to edit `/config/addons/data/alakazam_dashboard/options.json` (see below)
+- ✅ The configuration is validated as JSON. If invalid, the dashboard will use defaults and show an error in the logs
+- ✅ **If you leave `dashboard_config` empty**, the dashboard will use the default configuration (Mat's setup) - perfect for testing!
+
+#### Easy Configuration Editing (Recommended)
+
+Since the add-on config field is single-line, here's an easier way to edit your configuration:
+
+**Using File Editor Add-on (Easiest):**
+1. Install the **File Editor** add-on (Settings → Add-ons → Add-on Store → File Editor)
+2. Open File Editor and navigate to: `/config/addons/data/alakazam_dashboard/options.json`
+3. Edit the `dashboard_config` field - you'll have a full editor with syntax highlighting!
+4. Save and restart the Alakazam Dashboard add-on
+
+**Alternative: Using Terminal/SSH:**
+1. SSH into Home Assistant or use the Terminal add-on
+2. Edit: `/config/addons/data/alakazam_dashboard/options.json`
+3. Use your favorite editor (nano, vi, etc.)
+4. Restart the add-on
 
 ## Configuration Methods
 
-### Method 1: Add-on Configuration Page (Recommended)
+### Method 1: Add-on Configuration Page
 - **Location:** Add-on Configuration tab in Home Assistant UI
-- **Field:** `dashboard_config` (multiline text field)
+- **Field:** `dashboard_config` (single-line text field)
+- **Limitation:** ⚠️ Home Assistant add-ons don't support multiline textareas
+- **Workaround:** Use File Editor add-on to edit `/config/addons/data/alakazam_dashboard/options.json` (see "Easy Configuration Editing" above)
 - **Benefits:** 
-  - ✅ Easy to edit through the UI
   - ✅ Validated automatically
   - ✅ Persists across updates
-  - ✅ No SSH required
+  - ✅ No SSH required (if using File Editor)
 
 ### Method 2: Manual File Editing (Advanced)
 - **Location:** `/config/addons/data/alakazam_dashboard/options.json`

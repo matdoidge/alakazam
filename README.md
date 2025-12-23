@@ -100,17 +100,33 @@ The dashboard is fully configurable! You can customize which entities, calendars
    - Go to **Settings** → **Add-ons** → **Alakazam Dashboard**
    - Click **Configuration** tab
 
-2. **Find the `dashboard_config` field** - This is a **large 20-line textarea** perfect for editing JSON/YAML
+2. **Find the `dashboard_config` field** - Paste your JSON configuration here
 
-3. **Paste your configuration** (see examples below)
+3. **Click "Save"** and **restart the add-on**
 
-4. **Click "Save"** and **restart the add-on**
-
-**Important Notes:**
-- ✅ The `dashboard_config` field is a **large textarea (20 lines)** - easy to see and edit your full configuration
+**⚠️ Important Notes:**
+- ⚠️ The `dashboard_config` field is a **single-line text field** (Home Assistant add-ons don't support multiline textareas)
+- ✅ You can paste multiline JSON - it will work, but it's harder to see/edit in the single-line field
+- ✅ **Better option**: Edit the config file directly using File Editor add-on (see below)
 - ✅ Configuration uses **JSON format** (not YAML) - use double quotes for strings
 - ✅ Configuration is validated automatically - if invalid, the dashboard uses defaults and shows an error in logs
 - ✅ **Leave `dashboard_config` empty** to use the default configuration (perfect for testing!)
+
+#### Easy Configuration Editing (Recommended)
+
+Since the add-on config field is single-line, here's an easier way to edit your configuration:
+
+**Using File Editor Add-on (Easiest):**
+1. Install the **File Editor** add-on (Settings → Add-ons → Add-on Store → File Editor)
+2. Open File Editor and navigate to: `/config/addons/data/alakazam_dashboard/options.json`
+3. Edit the `dashboard_config` field - you'll have a full editor with syntax highlighting!
+4. Save and restart the Alakazam Dashboard add-on
+
+**Alternative: Using Terminal/SSH:**
+1. SSH into Home Assistant or use the Terminal add-on
+2. Edit: `/config/addons/data/alakazam_dashboard/options.json`
+3. Use your favorite editor (nano, vi, etc.)
+4. Restart the add-on
 
 #### Configuration Structure
 
